@@ -19,11 +19,23 @@ export class LoginComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router, private formBuilder: FormBuilder ) { }
 
   ngOnInit() {
-    this.loginForm = this.formBuilder.group({
+    /*this.loginForm = this.formBuilder.group({
       email: ['', Validators.required],
       password: ['', Validators.required]
-    })    
+    })    */
   }
+
+  register(form){
+    console.log(form.value);
+    this.authService.register.subscribe((res) =>{
+      this.router.navigateByUrl('home')
+    })
+    
+      
+  }
+
+
+
 
   get formControls(){ 
     return this.loginForm.controls;
@@ -35,7 +47,7 @@ export class LoginComponent implements OnInit {
     if(this.formControls.invalid){
       return;
     }
-    this.authService.login(this.loginForm.value);
+    this.authService.signIn(this.loginForm.value);
     this.router.navigateByUrl('/admin');
 
   }

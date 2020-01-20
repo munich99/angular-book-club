@@ -6,6 +6,7 @@ import { JwtResponse } from  './jwt-response';
 
 import { tap } from  'rxjs/operators';
 import { Observable, BehaviorSubject } from  'rxjs';
+import { async } from '@angular/core/testing';
 
 
 @Injectable({
@@ -28,14 +29,35 @@ export class AuthService {
 
                             if(res.user){
                                 localStorage.set('ACCESS_TOKEN', res.user.access_token);
-                                localStorage.set('expires_in', res.user.expires_in);
+                                localStorage.set('EXPIRES_IN', res.user.expires_in);
                                 this.authSubject.next(true);
                             }
-
                         })                    
-                    )                   
-
+                    );  
     }
+
+    signIn(user: User): Observable<JwtResponse>{
+        return this.httpClient.post<JwtResponse>(`${this.AUTH_SERVER}/register`, user).
+                    pipe(async((res: JwtResponse) =>{
+                            if(res.user){
+                                localStorage.set('ACCESS_TOKEN', res.user.access_token);
+                                localStorage.set('EXPIRES_IN',res.user.expires_in);
+                                this.authSubject.next(true);
+                            }
+                        })
+                    );
+    }
+
+    signOut(){
+        localStorage.removeItem('ACCESS_TOKEN');
+        localStorage.removeItem('EXPIRES_IN');
+        this.authSubject.next(false);
+    }
+
+    isAuthenticated(){
+        return this.authSubject.asObservable();
+    }
+
 
 
 
